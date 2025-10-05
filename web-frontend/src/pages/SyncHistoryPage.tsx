@@ -10,7 +10,6 @@ import {
   Alert,
   CircularProgress,
   Stack,
-  Grid,
   Divider,
 } from '@mui/material';
 import {
@@ -181,35 +180,43 @@ const SyncHistoryPage: React.FC = () => {
                       />
                     </Box>
 
-                    <Grid container spacing={3} sx={{ mb: 2 }}>
-                      <Grid item xs={12} sm={6} md={3}>
+                    <Box sx={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: {
+                        xs: 'repeat(2, 1fr)',
+                        sm: 'repeat(4, 1fr)'
+                      },
+                      gap: 2,
+                      mb: 2
+                    }}>
+                      <Box>
                         <Typography variant="body2" color="text.secondary">
                           Total Tracks
                         </Typography>
                         <Typography variant="body1" fontWeight={600}>
                           {sync.total_tracks}
                         </Typography>
-                      </Grid>
+                      </Box>
                       
-                      <Grid item xs={12} sm={6} md={3}>
+                      <Box>
                         <Typography variant="body2" color="text.secondary">
                           Synced
                         </Typography>
                         <Typography variant="body1" fontWeight={600} color="success.main">
                           {sync.synced_tracks}
                         </Typography>
-                      </Grid>
+                      </Box>
                       
-                      <Grid item xs={12} sm={6} md={3}>
+                      <Box>
                         <Typography variant="body2" color="text.secondary">
                           Failed
                         </Typography>
                         <Typography variant="body1" fontWeight={600} color="error.main">
                           {sync.failed_tracks}
                         </Typography>
-                      </Grid>
+                      </Box>
                       
-                      <Grid item xs={12} sm={6} md={3}>
+                      <Box>
                         <Typography variant="body2" color="text.secondary">
                           Success Rate
                         </Typography>
@@ -219,8 +226,8 @@ const SyncHistoryPage: React.FC = () => {
                             : 0
                           }%
                         </Typography>
-                      </Grid>
-                    </Grid>
+                      </Box>
+                    </Box>
 
                     {sync.status === 'in_progress' && (
                       <Box sx={{ mb: 2 }}>
@@ -242,45 +249,52 @@ const SyncHistoryPage: React.FC = () => {
 
                     <Divider sx={{ my: 2 }} />
 
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
+                    <Box sx={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: {
+                        xs: '1fr',
+                        sm: 'repeat(2, 1fr)'
+                      },
+                      gap: 2
+                    }}>
+                      <Box>
                         <Typography variant="body2" color="text.secondary">
                           Started
                         </Typography>
                         <Typography variant="body2">
                           {new Date(sync.created_at).toLocaleString()}
                         </Typography>
-                      </Grid>
+                      </Box>
                       
                       {sync.completed_at && (
-                        <Grid item xs={12} sm={6}>
+                        <Box>
                           <Typography variant="body2" color="text.secondary">
                             Completed
                           </Typography>
                           <Typography variant="body2">
                             {new Date(sync.completed_at).toLocaleString()}
                           </Typography>
-                        </Grid>
+                        </Box>
                       )}
                       
-                      <Grid item xs={12} sm={6}>
+                      <Box>
                         <Typography variant="body2" color="text.secondary">
                           Duration
                         </Typography>
                         <Typography variant="body2">
                           {formatDuration(sync.created_at, sync.completed_at)}
                         </Typography>
-                      </Grid>
+                      </Box>
                       
-                      <Grid item xs={12} sm={6}>
+                      <Box>
                         <Typography variant="body2" color="text.secondary">
                           Task ID
                         </Typography>
                         <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
                           {sync.task_id}
                         </Typography>
-                      </Grid>
-                    </Grid>
+                      </Box>
+                    </Box>
 
                     {sync.apple_music_playlist && (
                       <Box sx={{ mt: 2 }}>

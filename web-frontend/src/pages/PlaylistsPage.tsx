@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Grid,
   Card,
   CardContent,
   CardMedia,
@@ -129,9 +128,18 @@ const PlaylistsPage: React.FC = () => {
         </Alert>
       )}
 
-      <Grid container spacing={3}>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          md: 'repeat(3, 1fr)',
+          lg: 'repeat(4, 1fr)'
+        },
+        gap: 3
+      }}>
         {playlists.map((playlist) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={playlist.id}>
+          <Box key={playlist.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardMedia
                 sx={{
@@ -195,9 +203,9 @@ const PlaylistsPage: React.FC = () => {
                 </Button>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       {playlists.length === 0 && !loading && (
         <Box sx={{ textAlign: 'center', py: 8 }}>

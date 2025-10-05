@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
-  Grid,
   Card,
   CardContent,
   Typography,
@@ -86,116 +85,123 @@ const DashboardPage: React.FC = () => {
         Welcome back, {user.displayName}!
       </Typography>
       
-      <Grid container spacing={3} sx={{ mt: 2 }}>
-        {/* Account Status */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Account Status
-              </Typography>
-              
-              <Stack spacing={3}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Avatar sx={{ bgcolor: '#1db954' }}>S</Avatar>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="body1">Spotify</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Music streaming service
-                    </Typography>
-                  </Box>
-                  <Chip
-                    label={user.spotifyConnected ? 'Connected' : 'Not Connected'}
-                    color={user.spotifyConnected ? 'success' : 'error'}
-                    variant={user.spotifyConnected ? 'filled' : 'outlined'}
-                  />
-                </Box>
-
-                <Divider />
-
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Avatar sx={{ bgcolor: '#ff6b6b' }}>A</Avatar>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="body1">Apple Music</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Apple's music service
-                    </Typography>
-                  </Box>
-                  <Chip
-                    label={user.appleMusicConnected ? 'Connected' : 'Not Connected'}
-                    color={user.appleMusicConnected ? 'success' : 'error'}
-                    variant={user.appleMusicConnected ? 'filled' : 'outlined'}
-                  />
-                </Box>
-
-                {!canSync && (
-                  <Alert severity="info" sx={{ mt: 2 }}>
-                    Connect both services to start syncing playlists between them.
-                  </Alert>
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Quick Actions */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Quick Actions
-              </Typography>
-              
-              <Stack spacing={2}>
-                <Button
-                  variant="contained"
-                  startIcon={<PlaylistPlay />}
-                  onClick={() => navigate('/playlists')}
-                  disabled={!canSync}
-                  size="large"
-                  fullWidth
-                >
-                  Browse & Sync Playlists
-                </Button>
+      <Stack spacing={3} sx={{ mt: 2 }}>
+        {/* Account Status and Quick Actions Row */}
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: { xs: 'column', md: 'row' }, 
+          gap: 3 
+        }}>
+          {/* Account Status */}
+          <Box sx={{ flex: 1 }}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Account Status
+                </Typography>
                 
-                <Button
-                  variant="outlined"
-                  startIcon={<History />}
-                  onClick={() => navigate('/history')}
-                  size="large"
-                  fullWidth
-                >
-                  View Sync History
-                </Button>
+                <Stack spacing={3}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: '#1db954' }}>S</Avatar>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="body1">Spotify</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Music streaming service
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={user.spotifyConnected ? 'Connected' : 'Not Connected'}
+                      color={user.spotifyConnected ? 'success' : 'error'}
+                      variant={user.spotifyConnected ? 'filled' : 'outlined'}
+                    />
+                  </Box>
 
-                {!user.spotifyConnected && (
+                  <Divider />
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: '#ff6b6b' }}>A</Avatar>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="body1">Apple Music</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Apple's music service
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={user.appleMusicConnected ? 'Connected' : 'Not Connected'}
+                      color={user.appleMusicConnected ? 'success' : 'error'}
+                      variant={user.appleMusicConnected ? 'filled' : 'outlined'}
+                    />
+                  </Box>
+
+                  {!canSync && (
+                    <Alert severity="info" sx={{ mt: 2 }}>
+                      Connect both services to start syncing playlists between them.
+                    </Alert>
+                  )}
+                </Stack>
+              </CardContent>
+            </Card>
+          </Box>
+
+          {/* Quick Actions */}
+          <Box sx={{ flex: 1 }}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Quick Actions
+                </Typography>
+                
+                <Stack spacing={2}>
+                  <Button
+                    variant="contained"
+                    startIcon={<PlaylistPlay />}
+                    onClick={() => navigate('/playlists')}
+                    disabled={!canSync}
+                    size="large"
+                    fullWidth
+                  >
+                    Browse & Sync Playlists
+                  </Button>
+                  
                   <Button
                     variant="outlined"
-                    onClick={() => {/* Handle connect Spotify */}}
-                    size="medium"
-                    sx={{ color: '#1db954', borderColor: '#1db954' }}
+                    startIcon={<History />}
+                    onClick={() => navigate('/history')}
+                    size="large"
+                    fullWidth
                   >
-                    Connect Spotify
+                    View Sync History
                   </Button>
-                )}
 
-                {!user.appleMusicConnected && (
-                  <Button
-                    variant="outlined"
-                    onClick={() => {/* Handle connect Apple Music */}}
-                    size="medium"
-                    sx={{ color: '#ff6b6b', borderColor: '#ff6b6b' }}
-                  >
-                    Connect Apple Music
-                  </Button>
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
+                  {!user.spotifyConnected && (
+                    <Button
+                      variant="outlined"
+                      onClick={() => {/* Handle connect Spotify */}}
+                      size="medium"
+                      sx={{ color: '#1db954', borderColor: '#1db954' }}
+                    >
+                      Connect Spotify
+                    </Button>
+                  )}
+
+                  {!user.appleMusicConnected && (
+                    <Button
+                      variant="outlined"
+                      onClick={() => {/* Handle connect Apple Music */}}
+                      size="medium"
+                      sx={{ color: '#ff6b6b', borderColor: '#ff6b6b' }}
+                    >
+                      Connect Apple Music
+                    </Button>
+                  )}
+                </Stack>
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
 
         {/* Recent Sync Activity */}
-        <Grid item xs={12}>
+        <Box>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
@@ -260,8 +266,8 @@ const DashboardPage: React.FC = () => {
               )}
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
+        </Box>
+      </Stack>
     </Box>
   );
 };

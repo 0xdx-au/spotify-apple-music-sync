@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     SPOTIFY_CLIENT_SECRET: str = ""
     SPOTIFY_REDIRECT_URI: str = "http://localhost:8000/auth/spotify/callback"
     
+    # Dynamic URLs for multi-environment support
+    FRONTEND_URL: str = "http://localhost:3000"
+    BACKEND_URL: str = "http://localhost:8000"
+    
     # Apple Music API
     APPLE_MUSIC_KEY_ID: str = ""
     APPLE_MUSIC_TEAM_ID: str = ""
