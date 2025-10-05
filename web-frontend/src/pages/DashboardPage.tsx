@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
+  Grid,
   Card,
   CardContent,
   Typography,
@@ -13,7 +14,6 @@ import {
   LinearProgress,
   Divider,
 } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
 import {
   PlaylistPlay,
   History,
@@ -88,7 +88,7 @@ const DashboardPage: React.FC = () => {
       
       <Grid container spacing={3} sx={{ mt: 2 }}>
         {/* Account Status */}
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -139,7 +139,7 @@ const DashboardPage: React.FC = () => {
         </Grid>
 
         {/* Quick Actions */}
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -195,7 +195,7 @@ const DashboardPage: React.FC = () => {
         </Grid>
 
         {/* Recent Sync Activity */}
-        <Grid xs={12}>
+        <Grid item xs={12}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>

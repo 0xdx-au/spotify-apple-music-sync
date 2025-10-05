@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
+  Grid,
   Card,
   CardContent,
   CardMedia,
@@ -17,7 +18,6 @@ import {
   CircularProgress,
   Chip,
 } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
 import { CloudSync, PlaylistPlay, MusicNote } from '@mui/icons-material';
 import { useAuth } from '../hooks/useAuth';
 import { playlistApi, Playlist, SyncRequest } from '../services/api';
@@ -131,7 +131,7 @@ const PlaylistsPage: React.FC = () => {
 
       <Grid container spacing={3}>
         {playlists.map((playlist) => (
-          <Grid xs={12} sm={6} md={4} lg={3} key={playlist.id}>
+          <Grid item xs={12} sm={6} md={4} lg={3} key={playlist.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardMedia
                 sx={{

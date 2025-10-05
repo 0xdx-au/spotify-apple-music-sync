@@ -10,9 +10,9 @@ import {
   Alert,
   CircularProgress,
   Stack,
+  Grid,
   Divider,
 } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
 import {
   CheckCircle,
   Error as ErrorIcon,
@@ -182,7 +182,7 @@ const SyncHistoryPage: React.FC = () => {
                     </Box>
 
                     <Grid container spacing={3} sx={{ mb: 2 }}>
-                      <Grid xs={12} sm={6} md={3}>
+                      <Grid item xs={12} sm={6} md={3}>
                         <Typography variant="body2" color="text.secondary">
                           Total Tracks
                         </Typography>
@@ -191,7 +191,7 @@ const SyncHistoryPage: React.FC = () => {
                         </Typography>
                       </Grid>
                       
-                      <Grid xs={12} sm={6} md={3}>
+                      <Grid item xs={12} sm={6} md={3}>
                         <Typography variant="body2" color="text.secondary">
                           Synced
                         </Typography>
@@ -200,7 +200,7 @@ const SyncHistoryPage: React.FC = () => {
                         </Typography>
                       </Grid>
                       
-                      <Grid xs={12} sm={6} md={3}>
+                      <Grid item xs={12} sm={6} md={3}>
                         <Typography variant="body2" color="text.secondary">
                           Failed
                         </Typography>
@@ -209,7 +209,7 @@ const SyncHistoryPage: React.FC = () => {
                         </Typography>
                       </Grid>
                       
-                      <Grid xs={12} sm={6} md={3}>
+                      <Grid item xs={12} sm={6} md={3}>
                         <Typography variant="body2" color="text.secondary">
                           Success Rate
                         </Typography>
@@ -243,7 +243,7 @@ const SyncHistoryPage: React.FC = () => {
                     <Divider sx={{ my: 2 }} />
 
                     <Grid container spacing={2}>
-                      <Grid xs={12} sm={6}>
+                      <Grid item xs={12} sm={6}>
                         <Typography variant="body2" color="text.secondary">
                           Started
                         </Typography>
@@ -253,7 +253,7 @@ const SyncHistoryPage: React.FC = () => {
                       </Grid>
                       
                       {sync.completed_at && (
-                        <Grid xs={12} sm={6}>
+                        <Grid item xs={12} sm={6}>
                           <Typography variant="body2" color="text.secondary">
                             Completed
                           </Typography>
@@ -263,7 +263,7 @@ const SyncHistoryPage: React.FC = () => {
                         </Grid>
                       )}
                       
-                      <Grid xs={12} sm={6}>
+                      <Grid item xs={12} sm={6}>
                         <Typography variant="body2" color="text.secondary">
                           Duration
                         </Typography>
@@ -272,7 +272,7 @@ const SyncHistoryPage: React.FC = () => {
                         </Typography>
                       </Grid>
                       
-                      <Grid xs={12} sm={6}>
+                      <Grid item xs={12} sm={6}>
                         <Typography variant="body2" color="text.secondary">
                           Task ID
                         </Typography>
