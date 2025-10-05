@@ -9,3 +9,5 @@ pytest-asyncio>=0.21.1
 httpx>=0.25.2
 aiohttp>=3.9.0
 PyJWT>=2.8.0
+cryptography>=41.0.0
+redis>=5.0.1
