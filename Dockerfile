@@ -16,7 +16,9 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 # Copy application code
 COPY src/ ./src/
-COPY config/ ./config/
+# The 'config/' directory was not found in the build context. Please ensure it exists and is included.
+# If the config directory is located elsewhere, update this path accordingly.
+# COPY config/ ./config/
 
 # Create non-root user and set permissions
 RUN chown -R appuser:appuser /app
