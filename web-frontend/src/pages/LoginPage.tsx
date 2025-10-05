@@ -32,6 +32,34 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    try {
+      setError(null);
+      setCurrentProvider(null);
+      
+      // Call demo login endpoint
+      const response = await fetch('https://localhost:8000/api/demo/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Demo login failed');
+      }
+      
+      const data = await response.json();
+      
+      // Store token and redirect
+      localStorage.setItem('auth_token', data.token);
+      window.location.reload();
+      
+    } catch (err: any) {
+      setError(err.message || 'Demo login failed');
+    }
+  };
+
   return (
     <Container maxWidth="sm">
       <Box
@@ -143,9 +171,35 @@ const LoginPage: React.FC = () => {
                 </Button>
               </Stack>
 
-              <Box sx={{ mt: 4, pt: 3, borderTop: 1, borderColor: 'divider' }}>
+              <Divider sx={{ my: 3 }}>
                 <Typography variant="body2" color="text.secondary">
-                  You can connect to either service first, then link the other service later.
+                  OR
+                </Typography>
+              </Divider>
+
+              <Button
+                variant="outlined"
+                size="large"
+                fullWidth
+                onClick={() => handleDemoLogin()}
+                disabled={loading}
+                sx={{
+                  borderColor: 'grey.600',
+                  color: 'text.primary',
+                  '&:hover': {
+                    borderColor: 'grey.400',
+                    bgcolor: 'grey.900',
+                  },
+                }}
+              >
+                🚀 Try Demo Mode
+              </Button>
+
+              <Box sx={{ mt: 4, pt: 3, borderTop: 1, borderColor: 'divider' }}>
+                <Typography variant="body2" color="text.secondary" textAlign="center">
+                  Demo mode lets you test the interface with sample data.
+                  <br />
+                  For real usage, connect your actual Spotify account.
                 </Typography>
               </Box>
             </Stack>

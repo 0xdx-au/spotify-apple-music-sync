@@ -3,9 +3,10 @@ Spotify to Apple Music Playlist Sync Service
 Main FastAPI application entry point
 """
 
-from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 from typing import List, Optional
 import logging
@@ -14,6 +15,8 @@ from datetime import datetime
 from .services.spotify_service import SpotifyService
 from .services.apple_music_service import AppleMusicService
 from .services.playlist_sync_service import PlaylistSyncService
+from .services.auth_service import AuthService
+from .services.demo_service import DemoService
 from .models.playlist import PlaylistResponse, SyncRequest, SyncResponse
 from .core.config import settings
 from .core.security import verify_token
@@ -46,6 +49,8 @@ app.add_middleware(
 spotify_service = SpotifyService()
 apple_music_service = AppleMusicService()
 playlist_sync_service = PlaylistSyncService(spotify_service, apple_music_service)
+auth_service = AuthService()
+demo_service = DemoService()
 
 @app.get("/health")
 async def health_check():
@@ -123,6 +128,172 @@ async def get_sync_history(
     except Exception as e:
         logger.error(f"Failed to get sync history: {e}")
         raise HTTPException(status_code=500, detail="Failed to retrieve sync history")
+
+# OAuth Authentication Endpoints
+@app.get("/api/auth/{provider}")
+async def auth_redirect(provider: str, request: Request):
+    """Redirect to OAuth provider"""
+    try:
+        if provider not in ['spotify', 'apple-music']:
+            raise HTTPException(status_code=400, detail="Unsupported provider")
+        
+        # Use the request's origin as base for redirect URI
+        redirect_uri = f"{request.base_url}api/auth/{provider}/callback"
+        
+        oauth_data = auth_service.generate_oauth_url(provider, str(redirect_uri))
+        
+        return RedirectResponse(url=oauth_data["auth_url"])
+    except Exception as e:
+        logger.error(f"OAuth redirect failed for {provider}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to initiate OAuth")
+
+@app.get("/api/auth/{provider}/callback")
+async def auth_callback(provider: str, code: str = None, state: str = None, error: str = None):
+    """Handle OAuth callback"""
+    try:
+        if error:
+            logger.error(f"OAuth error for {provider}: {error}")
+            return HTMLResponse(
+                content=f"""
+                <html>
+                    <body>
+                        <script>
+                            window.opener.postMessage({{ 
+                                type: 'AUTH_ERROR', 
+                                error: '{error}' 
+                            }}, window.location.origin);
+                            window.close();
+                        </script>
+                        <p>Authentication failed: {error}</p>
+                    </body>
+                </html>
+                """
+            )
+        
+        if not code or not state:
+            raise HTTPException(status_code=400, detail="Missing required parameters")
+        
+        auth_result = await auth_service.handle_oauth_callback(provider, code, state)
+        
+        # Return HTML that posts message to parent window
+        return HTMLResponse(
+            content=f"""
+            <html>
+                <body>
+                    <script>
+                        window.opener.postMessage({{ 
+                            type: 'AUTH_SUCCESS', 
+                            token: '{auth_result["token"]}',
+                            user: {auth_result["user"]} 
+                        }}, window.location.origin);
+                        window.close();
+                    </script>
+                    <p>Authentication successful! You can close this window.</p>
+                </body>
+            </html>
+            """
+        )
+    except Exception as e:
+        logger.error(f"OAuth callback failed for {provider}: {e}")
+        return HTMLResponse(
+            content=f"""
+            <html>
+                <body>
+                    <script>
+                        window.opener.postMessage({{ 
+                            type: 'AUTH_ERROR', 
+                            error: 'Authentication failed' 
+                        }}, window.location.origin);
+                        window.close();
+                    </script>
+                    <p>Authentication failed: {str(e)}</p>
+                </body>
+            </html>
+            """
+        )
+
+@app.get("/api/user/profile")
+async def get_user_profile(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get current user profile"""
+    try:
+        token = verify_token(credentials.credentials)
+        user_id = token["user_id"]
+        
+        # Check if demo mode
+        if token.get("demo_mode"):
+            profile = demo_service.get_demo_user_profile(user_id)
+        else:
+            profile = auth_service.get_user_profile(user_id)
+        
+        if not profile:
+            raise HTTPException(status_code=404, detail="User profile not found")
+        
+        return profile
+    except Exception as e:
+        logger.error(f"Failed to get user profile: {e}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve user profile")
+
+# Demo Mode Endpoints
+@app.post("/api/demo/login")
+async def demo_login():
+    """Create a demo user session for testing"""
+    try:
+        demo_auth = demo_service.create_demo_user()
+        return demo_auth
+    except Exception as e:
+        logger.error(f"Demo login failed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create demo session")
+
+@app.get("/api/demo/playlists")
+async def get_demo_playlists(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get demo Spotify playlists"""
+    try:
+        token = verify_token(credentials.credentials)
+        if not token.get("demo_mode"):
+            raise HTTPException(status_code=403, detail="Demo mode required")
+        
+        playlists = demo_service.get_demo_playlists()
+        return playlists
+    except Exception as e:
+        logger.error(f"Failed to get demo playlists: {e}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve demo playlists")
+
+@app.post("/api/demo/sync")
+async def demo_sync_playlist(
+    sync_request: SyncRequest,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Simulate playlist sync in demo mode"""
+    try:
+        token = verify_token(credentials.credentials)
+        if not token.get("demo_mode"):
+            raise HTTPException(status_code=403, detail="Demo mode required")
+        
+        result = demo_service.simulate_sync(sync_request.spotify_playlist_id)
+        return result
+    except Exception as e:
+        logger.error(f"Demo sync failed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to simulate sync")
+
+@app.get("/api/demo/history")
+async def get_demo_sync_history(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Get demo sync history"""
+    try:
+        token = verify_token(credentials.credentials)
+        if not token.get("demo_mode"):
+            raise HTTPException(status_code=403, detail="Demo mode required")
+        
+        history = demo_service.get_demo_sync_history()
+        return history
+    except Exception as e:
+        logger.error(f"Failed to get demo history: {e}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve demo history")
 
 if __name__ == "__main__":
     import uvicorn

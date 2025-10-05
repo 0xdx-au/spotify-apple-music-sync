@@ -84,18 +84,37 @@ export interface SyncResponse {
   created_at: string;
 }
 
+// Helper function to check if user is in demo mode
+const isDemoMode = (): boolean => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) return false;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.demo_mode || false;
+  } catch {
+    return false;
+  }
+};
+
 export const playlistApi = {
-  getSpotifyPlaylists: (): Promise<Playlist[]> =>
-    apiClient.get('/api/spotify/playlists').then(response => response.data),
+  getSpotifyPlaylists: (): Promise<Playlist[]> => {
+    const endpoint = isDemoMode() ? '/api/demo/playlists' : '/api/spotify/playlists';
+    return apiClient.get(endpoint).then(response => response.data);
+  },
     
-  syncPlaylist: (request: SyncRequest): Promise<SyncResponse> =>
-    apiClient.post('/api/sync/playlist', request).then(response => response.data),
+  syncPlaylist: (request: SyncRequest): Promise<SyncResponse> => {
+    const endpoint = isDemoMode() ? '/api/demo/sync' : '/api/sync/playlist';
+    return apiClient.post(endpoint, request).then(response => response.data);
+  },
     
   getSyncStatus: (taskId: string): Promise<SyncTask> =>
     apiClient.get(`/api/sync/status/${taskId}`).then(response => response.data),
     
-  getSyncHistory: (): Promise<SyncTask[]> =>
-    apiClient.get('/api/sync/history').then(response => response.data),
+  getSyncHistory: (): Promise<SyncTask[]> => {
+    const endpoint = isDemoMode() ? '/api/demo/history' : '/api/sync/history';
+    return apiClient.get(endpoint).then(response => response.data);
+  },
 };
 
 export const authApi = {
