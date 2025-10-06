@@ -319,26 +319,76 @@ async def get_demo_sync_history(
 async def serve_frontend(path: str):
     """Serve React frontend for all non-API routes"""
     # Don't serve frontend for API routes
-    if path.startswith("api/") or path.startswith("health") or path.startswith("docs") or path.startswith("redoc") or path.startswith("openapi.json"):
+    if path.startswith("api/") or path == "health" or path == "docs" or path == "redoc" or path == "openapi.json":
         raise HTTPException(status_code=404, detail="Not Found")
     
     # Serve index.html for React routing
     index_file = os.path.join(static_dir, 'index.html')
+    logger.info(f"Looking for static files in: {static_dir}")
+    logger.info(f"Index file path: {index_file}")
+    logger.info(f"Index file exists: {os.path.exists(index_file)}")
+    
     if os.path.exists(index_file):
         return FileResponse(index_file)
     else:
-        # Fallback if no frontend is built
+        # Fallback if no frontend is built - serve a helpful page
         return HTMLResponse(
-            content="""
+            content=f"""
+            <!DOCTYPE html>
             <html>
-                <head><title>Playlist Sync Service</title></head>
+                <head>
+                    <title>Spotify-Apple Music Playlist Sync</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <style>
+                        body {{ font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 40px; background: #121212; color: #fff; }}
+                        .container {{ max-width: 800px; margin: 0 auto; text-align: center; }}
+                        .header {{ color: #1db954; margin-bottom: 40px; }}
+                        .card {{ background: #1e1e1e; padding: 30px; border-radius: 12px; margin: 20px 0; }}
+                        .button {{ display: inline-block; background: #1db954; color: white; padding: 12px 24px; 
+                                text-decoration: none; border-radius: 6px; margin: 10px; font-weight: 600; }}
+                        .button:hover {{ background: #1ed760; }}
+                        .debug {{ background: #333; padding: 15px; border-radius: 8px; margin-top: 30px; 
+                                font-family: monospace; font-size: 12px; text-align: left; }}
+                    </style>
+                </head>
                 <body>
-                    <h1>Spotify-Apple Music Playlist Sync</h1>
-                    <p>API service is running. Frontend not yet built.</p>
-                    <p><a href="/api/docs">View API Documentation</a></p>
+                    <div class="container">
+                        <h1 class="header">🎵 Spotify-Apple Music Playlist Sync</h1>
+                        
+                        <div class="card">
+                            <h2>Service is Running!</h2>
+                            <p>The API backend is operational, but the frontend interface is still being deployed.</p>
+                            
+                            <a href="/api/docs" class="button">📚 View API Documentation</a>
+                            <a href="/health" class="button">💚 Check Health Status</a>
+                        </div>
+                        
+                        <div class="card">
+                            <h3>What's This Service?</h3>
+                            <p>A modern web application for syncing playlists between Spotify and Apple Music with:</p>
+                            <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+                                <li>🔐 Secure user authentication</li>
+                                <li>💳 Token-based subscription tiers</li>
+                                <li>📊 Playlist analytics and statistics</li>
+                                <li>⚡ Fast automated sync</li>
+                                <li>📱 Responsive web interface</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="debug">
+                            <strong>Debug Info:</strong><br>
+                            Static Directory: {static_dir}<br>
+                            Index File: {index_file}<br>
+                            Directory Exists: {os.path.exists(static_dir)}<br>
+                            Index File Exists: {os.path.exists(index_file)}<br>
+                            Working Directory: {os.getcwd()}<br>
+                            Files in static dir: {os.listdir(static_dir) if os.path.exists(static_dir) else 'Directory not found'}
+                        </div>
+                    </div>
                 </body>
             </html>
-            """
+            """,
+            media_type="text/html"
         )
 
 # No direct uvicorn execution - use Procfile for deployment
