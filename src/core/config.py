@@ -3,8 +3,10 @@ Application configuration settings
 """
 
 from pydantic_settings import BaseSettings
-from typing import List
+from pydantic import field_validator
+from typing import List, Union
 import os
+import json
 
 class Settings(BaseSettings):
     """Application settings"""
@@ -43,6 +45,30 @@ class Settings(BaseSettings):
     # API Rate Limits
     SPOTIFY_RATE_LIMIT: int = 100  # requests per minute
     APPLE_MUSIC_RATE_LIMIT: int = 333  # requests per minute (20k per hour)
+    
+    @field_validator('ALLOWED_ORIGINS', mode='before')
+    @classmethod
+    def parse_allowed_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        """Parse ALLOWED_ORIGINS from various input formats"""
+        if isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            # Handle empty string
+            if not v.strip():
+                return ["http://localhost:3000"]
+            # Handle comma-separated string
+            if ',' in v:
+                return [origin.strip() for origin in v.split(',') if origin.strip()]
+            # Handle JSON string
+            if v.strip().startswith('['):
+                try:
+                    parsed = json.loads(v)
+                    return parsed if isinstance(parsed, list) else [str(parsed)]
+                except json.JSONDecodeError:
+                    return [v.strip()]
+            # Single URL
+            return [v.strip()]
+        return ["http://localhost:3000"]
     
     class Config:
         env_file = ".env"
