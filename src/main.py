@@ -6,10 +6,12 @@ Main FastAPI application entry point
 from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Optional
 import logging
+import os
 from datetime import datetime
 
 from .services.spotify_service import SpotifyService
@@ -51,6 +53,11 @@ apple_music_service = AppleMusicService()
 playlist_sync_service = PlaylistSyncService(spotify_service, apple_music_service)
 auth_service = AuthService()
 demo_service = DemoService()
+
+# Mount static files for React frontend
+static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/")
 async def root():
@@ -306,5 +313,32 @@ async def get_demo_sync_history(
     except Exception as e:
         logger.error(f"Failed to get demo history: {e}")
         raise HTTPException(status_code=500, detail="Failed to retrieve demo history")
+
+# Catch-all route to serve React app (must be last)
+@app.get("/{path:path}")
+async def serve_frontend(path: str):
+    """Serve React frontend for all non-API routes"""
+    # Don't serve frontend for API routes
+    if path.startswith("api/") or path.startswith("health") or path.startswith("docs") or path.startswith("redoc") or path.startswith("openapi.json"):
+        raise HTTPException(status_code=404, detail="Not Found")
+    
+    # Serve index.html for React routing
+    index_file = os.path.join(static_dir, 'index.html')
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    else:
+        # Fallback if no frontend is built
+        return HTMLResponse(
+            content="""
+            <html>
+                <head><title>Playlist Sync Service</title></head>
+                <body>
+                    <h1>Spotify-Apple Music Playlist Sync</h1>
+                    <p>API service is running. Frontend not yet built.</p>
+                    <p><a href="/api/docs">View API Documentation</a></p>
+                </body>
+            </html>
+            """
+        )
 
 # No direct uvicorn execution - use Procfile for deployment

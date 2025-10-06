@@ -1,3 +1,12 @@
+# Multi-stage build: Frontend build stage
+FROM node:18-alpine as frontend-build
+WORKDIR /app/frontend
+COPY web-frontend/package*.json ./
+RUN npm ci --only=production
+COPY web-frontend/ ./
+RUN npm run build
+
+# Backend stage
 FROM python:3.11-slim-bullseye
 
 # Security hardening
@@ -17,11 +26,12 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copy application code
 COPY src/ ./src/
 
+# Copy built frontend from frontend-build stage
+COPY --from=frontend-build /app/frontend/build ./static/
+
 # Create non-root user and set permissions
 RUN chown -R appuser:appuser /app
 USER appuser
-
-# Health check removed - curl not available in slim image
 
 # Expose port
 EXPOSE 8000

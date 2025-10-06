@@ -23,6 +23,8 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../hooks/useAuth';
 import { playlistApi, SyncTask } from '../services/api';
+import SubscriptionCard from '../components/SubscriptionCard';
+import TimeEstimateCard from '../components/TimeEstimateCard';
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -78,6 +80,11 @@ const DashboardPage: React.FC = () => {
   if (!user) return null;
 
   const canSync = user.spotifyConnected && user.appleMusicConnected;
+
+  const handleUpgrade = (currentTier: string) => {
+    // TODO: Implement subscription upgrade flow
+    console.log('Upgrading from:', currentTier);
+  };
 
   return (
     <Box>
@@ -197,6 +204,20 @@ const DashboardPage: React.FC = () => {
                 </Stack>
               </CardContent>
             </Card>
+          </Box>
+        </Box>
+
+        {/* Subscription and Time Estimate Row */}
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: { xs: 'column', md: 'row' }, 
+          gap: 3 
+        }}>
+          <Box sx={{ flex: 1 }}>
+            <SubscriptionCard onUpgrade={handleUpgrade} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <TimeEstimateCard />
           </Box>
         </Box>
 
