@@ -2,4 +2,4 @@
 cmds = ["pip install -r requirements.txt"]
 
 [start]
-cmd = "python debug_railway.py"
+cmd = "cd /app && python debug_railway.py"

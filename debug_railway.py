@@ -14,6 +14,28 @@ print(f"Python executable: {sys.executable}")
 print(f"Working directory: {os.getcwd()}")
 print(f"Command line args: {sys.argv}")
 print(f"Python version: {sys.version}")
+print(f"Script file location: {__file__}")
+
+# Try to change to /app directory if we're not there
+if '/app' not in os.getcwd():
+    print("\nTrying to change to /app directory...")
+    try:
+        os.chdir('/app')
+        print(f"Successfully changed to: {os.getcwd()}")
+    except Exception as e:
+        print(f"Could not change to /app: {e}")
+        # Try to find where our files actually are
+        print("Looking for src/ directory in common locations...")
+        for path in ['/app', '/workspace', os.path.expanduser('~'), '/']:
+            src_path = os.path.join(path, 'src')
+            if os.path.exists(src_path):
+                print(f"Found src/ at: {src_path}")
+                try:
+                    os.chdir(path)
+                    print(f"Changed working directory to: {os.getcwd()}")
+                    break
+                except Exception as e2:
+                    print(f"Could not change to {path}: {e2}")
 
 print("\n" + "="*60)
 print("=== RELEVANT ENVIRONMENT VARIABLES ===")
