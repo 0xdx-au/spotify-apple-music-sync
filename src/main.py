@@ -54,12 +54,49 @@ playlist_sync_service = PlaylistSyncService(spotify_service, apple_music_service
 auth_service = AuthService()
 demo_service = DemoService()
 
-# Mount static files for React frontend
+# Static directory path
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
-if os.path.exists(static_dir):
-    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-# Root route removed - React app will be served by catch-all route
+# Mount React's static assets
+if os.path.exists(static_dir):
+    react_static_dir = os.path.join(static_dir, 'static')
+    if os.path.exists(react_static_dir):
+        app.mount("/static", StaticFiles(directory=react_static_dir), name="react_static")
+
+# Individual routes for React assets
+@app.get("/favicon.ico")
+async def favicon():
+    return FileResponse(os.path.join(static_dir, "favicon.ico"))
+
+@app.get("/manifest.json")
+async def manifest():
+    return FileResponse(os.path.join(static_dir, "manifest.json"))
+
+@app.get("/logo192.png")
+async def logo192():
+    return FileResponse(os.path.join(static_dir, "logo192.png"))
+
+@app.get("/logo512.png")
+async def logo512():
+    return FileResponse(os.path.join(static_dir, "logo512.png"))
+
+@app.get("/")
+async def root():
+    """Serve React app at root"""
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+    index_file = os.path.join(static_dir, 'index.html')
+    
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    else:
+        return {
+            "service": "Spotify-Apple Music Playlist Sync",
+            "version": "1.0.0",
+            "status": "running",
+            "timestamp": datetime.utcnow().isoformat(),
+            "docs": "/api/docs",
+            "health": "/health"
+        }
 
 @app.get("/health")
 async def health_check():
