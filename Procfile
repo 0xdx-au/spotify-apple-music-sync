@@ -1,1 +1,1 @@
-web: python debug_railway.py
+web: ./railway_start.sh
