@@ -29,8 +29,8 @@ app = FastAPI(
     title="Spotify-Apple Music Playlist Sync",
     description="Microservice for syncing playlists between Spotify and Apple Music",
     version="1.0.0",
-    docs_url="/api/docs" if settings.ENVIRONMENT == "development" else None,
-    redoc_url="/api/redoc" if settings.ENVIRONMENT == "development" else None,
+    docs_url="/api/docs",  # Enable docs for testing
+    redoc_url="/api/redoc",  # Enable redoc for testing
 )
 
 # Security middleware
@@ -51,6 +51,18 @@ apple_music_service = AppleMusicService()
 playlist_sync_service = PlaylistSyncService(spotify_service, apple_music_service)
 auth_service = AuthService()
 demo_service = DemoService()
+
+@app.get("/")
+async def root():
+    """Root endpoint with service information"""
+    return {
+        "service": "Spotify-Apple Music Playlist Sync",
+        "version": "1.0.0",
+        "status": "running",
+        "timestamp": datetime.utcnow().isoformat(),
+        "docs": "/api/docs",
+        "health": "/health"
+    }
 
 @app.get("/health")
 async def health_check():
