@@ -295,22 +295,4 @@ async def get_demo_sync_history(
         logger.error(f"Failed to get demo history: {e}")
         raise HTTPException(status_code=500, detail="Failed to retrieve demo history")
 
-if __name__ == "__main__":
-    import uvicorn
-    import os
-    # Only use SSL in development when certificates exist
-    ssl_config = {}
-    if settings.ENVIRONMENT == "development":
-        if os.path.exists("config/key.pem") and os.path.exists("config/cert.pem"):
-            ssl_config = {
-                "ssl_keyfile": "config/key.pem",
-                "ssl_certfile": "config/cert.pem"
-            }
-    
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=int(os.environ.get("PORT", 8000)),
-        log_level=settings.LOG_LEVEL.lower(),
-        **ssl_config
-    )
+# No direct uvicorn execution - use Procfile for deployment
