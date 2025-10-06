@@ -1,0 +1,40 @@
+# 🚀 Railway Environment Variables for lucid-integrity
+# Copy these into Railway's Variables section
+
+# Spotify API (REQUIRED - Get from https://developer.spotify.com/dashboard)
+SPOTIFY_CLIENT_ID=your_actual_spotify_client_id_from_dashboard
+SPOTIFY_CLIENT_SECRET=your_actual_spotify_client_secret_from_dashboard
+
+# Generated secure secrets (USE THESE EXACTLY)
+SECRET_KEY=7cba68044870f47f4c2902f08a2558665d384f2e4a2769e079979b906ee3e992
+REDIS_PASSWORD=eb81ec16f11c74e496ccc73d2b59e002
+
+# Environment settings
+ENVIRONMENT=production
+DEBUG=false
+LOG_LEVEL=info
+
+# Railway URLs (UPDATE IF YOUR URLs ARE DIFFERENT)
+BACKEND_URL=https://lucid-integrity.up.railway.app
+FRONTEND_URL=https://lucid-integrity.up.railway.app
+SPOTIFY_REDIRECT_URI=https://lucid-integrity.up.railway.app/api/auth/spotify/callback
+
+# CORS settings
+ALLOWED_ORIGINS=https://lucid-integrity.up.railway.app
+
+# Rate limiting
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW=60
+SPOTIFY_RATE_LIMIT=100
+APPLE_MUSIC_RATE_LIMIT=333
+
+# Optional: Apple Music API (for full sync functionality)
+# APPLE_MUSIC_KEY_ID=your_apple_music_key_id
+# APPLE_MUSIC_TEAM_ID=your_apple_music_team_id  
+# APPLE_MUSIC_PRIVATE_KEY=your_apple_music_private_key
+
+# Instructions:
+# 1. Copy the variables above into Railway's Variables section
+# 2. Replace SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET with real values
+# 3. Update your Spotify app redirect URI to: https://lucid-integrity.up.railway.app/api/auth/spotify/callback
+# 4. If Railway gives you different URLs, update BACKEND_URL, FRONTEND_URL, SPOTIFY_REDIRECT_URI, and ALLOWED_ORIGINS
