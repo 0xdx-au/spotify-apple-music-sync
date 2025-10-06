@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     
     # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000"]
+    ALLOWED_ORIGINS: str = "http://localhost:3000"
     RATE_LIMIT_REQUESTS: int = 100
     RATE_LIMIT_WINDOW: int = 60
     
@@ -48,27 +48,38 @@ class Settings(BaseSettings):
     
     @field_validator('ALLOWED_ORIGINS', mode='before')
     @classmethod
-    def parse_allowed_origins(cls, v: Union[str, List[str]]) -> List[str]:
-        """Parse ALLOWED_ORIGINS from various input formats"""
+    def parse_allowed_origins(cls, v: Union[str, List[str]]) -> str:
+        """Parse ALLOWED_ORIGINS from various input formats and return as string"""
         if isinstance(v, list):
-            return v
+            return ','.join(v)
         if isinstance(v, str):
             # Handle empty string
             if not v.strip():
-                return ["http://localhost:3000"]
-            # Handle comma-separated string
-            if ',' in v:
-                return [origin.strip() for origin in v.split(',') if origin.strip()]
-            # Handle JSON string
-            if v.strip().startswith('['):
-                try:
-                    parsed = json.loads(v)
-                    return parsed if isinstance(parsed, list) else [str(parsed)]
-                except json.JSONDecodeError:
-                    return [v.strip()]
-            # Single URL
-            return [v.strip()]
-        return ["http://localhost:3000"]
+                return "http://localhost:3000"
+            # Already a string, return as-is
+            return v.strip()
+        return "http://localhost:3000"
+    
+    @property
+    def allowed_origins_list(self) -> List[str]:
+        """Get ALLOWED_ORIGINS as a list"""
+        if not self.ALLOWED_ORIGINS:
+            return ["http://localhost:3000"]
+        
+        # Handle JSON string format
+        if self.ALLOWED_ORIGINS.strip().startswith('['):
+            try:
+                parsed = json.loads(self.ALLOWED_ORIGINS)
+                return parsed if isinstance(parsed, list) else [str(parsed)]
+            except json.JSONDecodeError:
+                pass
+        
+        # Handle comma-separated string
+        if ',' in self.ALLOWED_ORIGINS:
+            return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(',') if origin.strip()]
+        
+        # Single URL
+        return [self.ALLOWED_ORIGINS.strip()]
     
     class Config:
         env_file = ".env"
