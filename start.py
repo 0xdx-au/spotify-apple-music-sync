@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Railway startup script that handles PORT environment variable properly
+Fixed SSL issue for production deployment
 """
 import os
 import sys
