@@ -59,17 +59,7 @@ static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-@app.get("/")
-async def root():
-    """Root endpoint with service information"""
-    return {
-        "service": "Spotify-Apple Music Playlist Sync",
-        "version": "1.0.0",
-        "status": "running",
-        "timestamp": datetime.utcnow().isoformat(),
-        "docs": "/api/docs",
-        "health": "/health"
-    }
+# Root route removed - React app will be served by catch-all route
 
 @app.get("/health")
 async def health_check():
@@ -316,7 +306,7 @@ async def get_demo_sync_history(
 
 # Catch-all route to serve React app (must be last)
 @app.get("/{path:path}")
-async def serve_frontend(path: str):
+async def serve_frontend(path: str = ""):
     """Serve React frontend for all non-API routes"""
     # Don't serve frontend for API routes
     if path.startswith("api/") or path == "health" or path == "docs" or path == "redoc" or path == "openapi.json":
